@@ -124,7 +124,7 @@ def create_new_drinks(payload):
     returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the updated drink
         or appropriate status code indicating reason for failure
 '''
-@app.route('/drinks/<int:drink_id>', methods=['PATCH'])
+@app.route('/drinks/<int:id>', methods=['PATCH'])
 @requires_auth('patch:drinks')
 def modify_drinks(payload, id):
     drink = Drink.query.filter(Drink.id == id).one_or_none()
@@ -157,7 +157,23 @@ def modify_drinks(payload, id):
     returns status code 200 and json {"success": True, "delete": id} where id is the id of the deleted record
         or appropriate status code indicating reason for failure
 '''
+@app.route('/drinks/<int:id>', methods=['DELETE'])
+@requires_auth('delete:drinks')
+def remove_drinks(payload, id):
+    drink = Drink.query.filter(Drink.id == id).one_or_none()
+    if drink is None:
+        abort(404)
 
+    try:
+        drink.delete()
+        
+    except:
+        abort(422)
+    
+    return jsonify({
+        "success": True,
+        "delete": id
+    }, 200)
 
 # Error Handling
 '''
