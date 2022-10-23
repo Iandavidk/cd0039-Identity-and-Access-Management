@@ -165,13 +165,23 @@ def verify_decode_jwt(token):
     return the decorator which passes the decoded payload to the decorated method
 '''
 def requires_auth(permission=''):
+    # The decorator "requires_auth" takes a permission parameter. This parameter is used to check if the user has permission to access the resource.
     def requires_auth_decorator(f):
         @wraps(f)
+        # The wrapper checks if the user has permission to access the resource and returns an error if they do not.
         def wrapper(*args, **kwargs):
             token = get_token_auth_header()
-            payload = verify_decode_jwt(token)
-            check_permissions(permission, payload)
-            return f(payload, *args, **kwargs)
 
+            try:
+                payload = verify_decode_jwt(token)
+            except AuthError as error:
+                abort(error.status_code)
+
+            try:
+                check_permissions(permission, payload)
+            except AuthError as error:
+                abort(error.status_code)
+
+            return f(payload, *args, **kwargs)
         return wrapper
     return requires_auth_decorator
