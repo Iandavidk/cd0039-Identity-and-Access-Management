@@ -11,13 +11,23 @@ app = Flask(__name__)
 setup_db(app)
 CORS(app)
 
+## AuthError Exception
+'''
+AuthError Exception
+A standardized way to communicate auth failure modes
+'''
+class AuthError(Exception):
+    def __init__(self, error, status_code):
+        self.error = error
+        self.status_code = status_code
+
 '''
 @TODO uncomment the following line to initialize the datbase
 !! NOTE THIS WILL DROP ALL RECORDS AND START YOUR DB FROM SCRATCH
 !! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
 !! Running this funciton will add one
 '''
-# db_drop_and_create_all()
+db_drop_and_create_all()
 
 # ROUTES
 '''
@@ -81,6 +91,11 @@ CORS(app)
 Example error handling for unprocessable entity
 '''
 
+@app.errorhandler(AuthError)
+def handle_auth_error(ex):
+    response = jsonify(ex.error)
+    response.status_code = ex.status_code
+    return response
 
 @app.errorhandler(422)
 def unprocessable(error):
