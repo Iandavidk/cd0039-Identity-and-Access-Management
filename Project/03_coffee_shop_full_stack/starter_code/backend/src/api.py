@@ -38,18 +38,21 @@ db_drop_and_create_all()
     returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
         or appropriate status code indicating reason for failure
 '''
+@app.route('/drinks')
 def retrieve_drinks():
     try:
         drinks = Drink.query.order_by(Drink.id).all()
         drinks = [drink.short() for drink in drinks]
 
-        return jsonify({
-            'success': True,
-            'drinks': drinks
-        }), 200
-
     except Exception:
         abort(404)
+
+    return jsonify({
+        'success': True,
+        'drinks': drinks
+    }), 200
+
+    
 
 '''
 @TODO implement endpoint
@@ -59,6 +62,19 @@ def retrieve_drinks():
     returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
         or appropriate status code indicating reason for failure
 '''
+@app.route('/drinks-detail', methods=['GET'])
+@requires_auth('get:drinks-detail')
+def show_drinks(payload):
+    try:
+        drinks = [drink.long() for drink in Drink.query.all()]
+        
+    except Exception:
+        abort(400)
+
+    return jsonify({
+        'success': True,
+        'drinks': drinks
+    }), 200
 
 
 '''
