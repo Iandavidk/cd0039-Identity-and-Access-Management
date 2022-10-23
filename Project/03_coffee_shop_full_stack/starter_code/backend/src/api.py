@@ -167,7 +167,7 @@ def remove_drinks(payload, id):
     try:
         drink.delete()
         
-    except:
+    except Exception:
         abort(422)
     
     return jsonify({
