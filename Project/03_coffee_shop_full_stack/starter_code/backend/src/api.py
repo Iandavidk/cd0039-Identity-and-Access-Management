@@ -110,7 +110,7 @@ def create_new_drinks(payload):
     return jsonify({
         "success": True,
         "drink": [drink.long()]
-    }, 200)
+    }), 200
 
 
 '''
@@ -173,7 +173,7 @@ def remove_drinks(payload, id):
     return jsonify({
         "success": True,
         "delete": id
-    }, 200)
+    }), 200
 
 # Error Handling
 '''
