@@ -1,10 +1,18 @@
-from flask import Flask, request, abort, _request_ctx_stack
+from ast import If
+from flask import Flask, request, abort
 import json
 from functools import wraps
 from jose import jwt
 from urllib.request import urlopen
+from collections.abc import Mapping
+#use as @functools.wraps()
+import functools
 
+#use directly as @wraps
+from functools import wraps
 
+app = Flask(__name__)
+# Auth0 variables
 AUTH0_DOMAIN = 'dev-0fhyzfbv3ljjvbgs.us.auth0.com'
 ALGORITHMS = ['RS256']
 API_AUDIENCE = 'coffeeshopapi'
@@ -18,7 +26,6 @@ class AuthError(Exception):
     def __init__(self, error, status_code):
         self.error = error
         self.status_code = status_code
-
 
 ## Auth Header
 
@@ -175,11 +182,7 @@ def requires_auth(permission=''):
                 payload = verify_decode_jwt(token)
             except :
                 abort(401)
-            try:
-                check_permissions(permission, payload)
-            except :
-                abort(403)
             return f(payload, *args, **kwargs)
-            
+
         return wrapper
     return requires_auth_decorator
