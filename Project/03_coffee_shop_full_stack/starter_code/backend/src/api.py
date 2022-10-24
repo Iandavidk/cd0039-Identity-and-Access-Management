@@ -249,3 +249,7 @@ def handle_auth_error(ex):
         "error": ex.status_code,
         "message": response
     })
+
+if __name__ == "__main__":
+    app.debug = True
+    app.run()
