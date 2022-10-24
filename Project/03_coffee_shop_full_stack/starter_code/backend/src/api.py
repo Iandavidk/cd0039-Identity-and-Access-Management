@@ -17,10 +17,12 @@ CORS(app)
 AuthError Exception
 A standardized way to communicate auth failure modes
 '''
+'''
 class AuthError(Exception):
     def __init__(self, error, status_code):
         self.error = error
         self.status_code = status_code
+'''
 
 '''
 @TODO uncomment the following line to initialize the datbase
@@ -64,7 +66,7 @@ def retrieve_drinks():
         or appropriate status code indicating reason for failure
 '''
 @app.route('/drinks-detail', methods=['GET'])
-@requires_auth('get:drinks-detail')
+@requires_auth(permission='get:drinks-detail')
 def show_drinks(payload):
     try:
         drinks = [drink.long() for drink in Drink.query.all()]
@@ -88,7 +90,7 @@ def show_drinks(payload):
         or appropriate status code indicating reason for failure
 '''
 @app.route('/drinks', methods=['POST'])
-@requires_auth('post:drinks')
+@requires_auth(permission='post:drinks')
 def create_new_drinks(payload):
     body = request.get_json()
 
@@ -125,7 +127,7 @@ def create_new_drinks(payload):
         or appropriate status code indicating reason for failure
 '''
 @app.route('/drinks/<int:id>', methods=['PATCH'])
-@requires_auth('patch:drinks')
+@requires_auth(permission='patch:drinks')
 def modify_drinks(payload, id):
     drink = Drink.query.filter(Drink.id == id).one_or_none()
     if drink is None:
@@ -158,7 +160,7 @@ def modify_drinks(payload, id):
         or appropriate status code indicating reason for failure
 '''
 @app.route('/drinks/<int:id>', methods=['DELETE'])
-@requires_auth('delete:drinks')
+@requires_auth(permission='delete:drinks')
 def remove_drinks(payload, id):
     drink = Drink.query.filter(Drink.id == id).one_or_none()
     if drink is None:
