@@ -1,4 +1,3 @@
-from ast import If
 from flask import Flask, request, abort
 import json
 from functools import wraps
