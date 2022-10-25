@@ -30,7 +30,7 @@ db_drop_and_create_all()
 '''
 @app.route('/')
 def home():
-    return '<h1> Hello, welcome to the CoffeeShop API <h1>'
+    return '<h1> Hello, welcome to the CoffeeShop API </h1>'
 
 @app.route('/drinks')
 def retrieve_drinks():
@@ -60,7 +60,7 @@ def show_drinks(payload):
 
     return jsonify({
         'success': True,
-        'drinks': [drink.long() for drink in Drink.query.all()]
+        'drinks': [drink.long() for drink in drinks]
     }), 200
 
 
@@ -107,7 +107,7 @@ def create_new_drinks(payload):
     returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the updated drink
         or appropriate status code indicating reason for failure
 '''
-@app.route('/drinks/<int:id>', methods=['PATCH'])
+@app.route('/drinks/<drink_id>', methods=['PATCH'])
 @requires_auth('patch:drinks')
 def modify_drinks(payload, drink_id):
 
@@ -148,6 +148,7 @@ def modify_drinks(payload, drink_id):
     'success': True,
     'drinks': [drink.long()]
 }), 200
+
 '''
 @TODO implement endpoint
     DELETE /drinks/<id>
@@ -158,7 +159,7 @@ def modify_drinks(payload, drink_id):
     returns status code 200 and json {"success": True, "delete": id} where id is the id of the deleted record
         or appropriate status code indicating reason for failure
 '''
-@app.route('/drinks/<int:id>', methods=['DELETE'])
+@app.route('/drinks/<any>', methods=['DELETE'])
 @requires_auth('delete:drinks')
 def remove_drinks(payload, any):
     drink = Drink.query.filter(Drink.id == any).one_or_none()
@@ -251,12 +252,11 @@ def internal_server_error(error):
     error handler should conform to general task above
 '''
 @app.errorhandler(AuthError)
-def handle_auth_error(ex):
-    response = jsonify(ex.error)
-    response.status_code = ex.status_code
+def auth_error(error):
+    print(error)
     return jsonify({
         "success": False,
-        "error": ex.status_code,
-        "message": response
-    })
+        "error": error.status_code,
+        "message": error.error['description']
+    }), error.status_code
 
