@@ -12,18 +12,6 @@ app = Flask(__name__)
 setup_db(app)
 CORS(app)
 
-## AuthError Exception
-'''
-AuthError Exception
-A standardized way to communicate auth failure modes
-'''
-'''
-class AuthError(Exception):
-    def __init__(self, error, status_code):
-        self.error = error
-        self.status_code = status_code
-'''
-
 '''
 @TODO uncomment the following line to initialize the datbase
 !! NOTE THIS WILL DROP ALL RECORDS AND START YOUR DB FROM SCRATCH
@@ -41,6 +29,10 @@ db_drop_and_create_all()
     returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
         or appropriate status code indicating reason for failure
 '''
+@app.route('/')
+def home():
+    return '<h1> Hello, welcome to the CoffeeShop API <h1>'
+
 @app.route('/drinks')
 def retrieve_drinks():
     try:
@@ -66,7 +58,7 @@ def retrieve_drinks():
         or appropriate status code indicating reason for failure
 '''
 @app.route('/drinks-detail', methods=['GET'])
-@requires_auth(permission='get:drinks-detail')
+@requires_auth('get:drinks-detail')
 def show_drinks(payload):
     try:
         drinks = [drink.long() for drink in Drink.query.all()]
@@ -90,7 +82,7 @@ def show_drinks(payload):
         or appropriate status code indicating reason for failure
 '''
 @app.route('/drinks', methods=['POST'])
-@requires_auth(permission='post:drinks')
+@requires_auth('post:drinks')
 def create_new_drinks(payload):
     body = request.get_json()
 
@@ -127,7 +119,7 @@ def create_new_drinks(payload):
         or appropriate status code indicating reason for failure
 '''
 @app.route('/drinks/<int:id>', methods=['PATCH'])
-@requires_auth(permission='patch:drinks')
+@requires_auth('patch:drinks')
 def modify_drinks(payload, id):
     drink = Drink.query.filter(Drink.id == id).one_or_none()
     if drink is None:
@@ -160,7 +152,7 @@ def modify_drinks(payload, id):
         or appropriate status code indicating reason for failure
 '''
 @app.route('/drinks/<int:id>', methods=['DELETE'])
-@requires_auth(permission='delete:drinks')
+@requires_auth('delete:drinks')
 def remove_drinks(payload, id):
     drink = Drink.query.filter(Drink.id == id).one_or_none()
     if drink is None:
@@ -221,6 +213,15 @@ def bad_request(error):
         "error": 400, 
         "message": "bad request"
     }), 400
+
+@app.errorhandler(401)
+def unauthorized(error):
+    print(error)
+    return jsonify({
+        "success": False,
+        "error": 401,
+        "message": 'Unathorized'
+    }), 401
 
 @app.errorhandler(405)
 def method_not_allowed(error):
